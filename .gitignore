@@ -1,0 +1,40 @@
+# Local build and package outputs
+/build*/
+/out/
+/dist/
+/.vs/
+/ignored/
+
+# Local project and generated media state
+/testproject1/
+/docs/
+/tests/
+/AGENTS.md
+/generations/
+*.datacutproject
+*.datacut-partial-*
+
+# Tool caches and private runtime environments
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.obj
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.user
+.venv/
+venv/
+**/checkpoints/
+**/hf_cache/
+**/huggingface/
+**/.cache/
+
+# Older experimental runtime paths, unused by the application package
+/scripts/runtime/voice_change.py
+/scripts/runtime/chatterbox_voice_change.py
+/scripts/runtime/setup_voice_bootstrap.ps1
+/scripts/runtime/setup_chatterbox_bootstrap.ps1
+/scripts/generate_icon.py

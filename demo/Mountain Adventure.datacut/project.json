@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "projectName": "Mountain Adventure",
+  "projectFrameRate": { "numerator": 30, "denominator": 1 },
+  "assets": [
+    { "id": "demo-lake", "path": "media/lake.mp4", "name": "lake.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "600", "durationUs": "20000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-forest", "path": "media/forest.mp4", "name": "forest.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "600", "durationUs": "20000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-hike", "path": "media/hike.mp4", "name": "hike.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "600", "durationUs": "20000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-sunset", "path": "media/sunset.mp4", "name": "sunset.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "600", "durationUs": "20000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-camp", "path": "media/camp.mp4", "name": "camp.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "360", "durationUs": "12000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-road", "path": "media/road.mp4", "name": "road.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "360", "durationUs": "12000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-waves", "path": "media/waves.mp4", "name": "waves.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "360", "durationUs": "12000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-drone", "path": "media/drone.mp4", "name": "drone.mp4", "rateNumerator": "30", "rateDenominator": "1", "frameCount": "360", "durationUs": "12000000", "width": 1280, "height": 720, "hasVideo": true, "hasAudio": false },
+    { "id": "demo-ambience", "path": "media/natural-ambience.wav", "name": "natural-ambience.wav", "rateNumerator": "48000", "rateDenominator": "1", "frameCount": "3840000", "durationUs": "80000000", "width": 0, "height": 0, "hasVideo": false, "hasAudio": true, "audioSampleRate": 48000 },
+    { "id": "demo-music", "path": "media/road-trip-music.mp3", "name": "road-trip-music.mp3", "rateNumerator": "48000", "rateDenominator": "1", "frameCount": "3360000", "durationUs": "70000000", "width": 0, "height": 0, "hasVideo": false, "hasAudio": true, "audioSampleRate": 48000 }
+  ],
+  "clips": [
+    { "id": "demo-clip-lake", "assetId": "demo-lake", "startFrame": "0", "durationFrames": "450", "sourceFirstFrame": "0", "sourceFrameCount": "450", "track": 0 },
+    { "id": "demo-clip-forest", "assetId": "demo-forest", "startFrame": "450", "durationFrames": "510", "sourceFirstFrame": "0", "sourceFrameCount": "510", "track": 0 },
+    { "id": "demo-clip-hike", "assetId": "demo-hike", "startFrame": "960", "durationFrames": "450", "sourceFirstFrame": "0", "sourceFrameCount": "450", "track": 0 },
+    { "id": "demo-clip-sunset", "assetId": "demo-sunset", "startFrame": "1410", "durationFrames": "600", "sourceFirstFrame": "0", "sourceFrameCount": "600", "track": 0 },
+    { "id": "demo-clip-drone", "assetId": "demo-drone", "startFrame": "2010", "durationFrames": "360", "sourceFirstFrame": "0", "sourceFrameCount": "360", "track": 0 },
+    { "id": "demo-clip-ambience", "assetId": "demo-ambience", "startFrame": "90", "durationFrames": "2280", "sourceFirstFrame": "0", "sourceFrameCount": "3648000", "track": 1 },
+    { "id": "demo-clip-music", "assetId": "demo-music", "startFrame": "0", "durationFrames": "2100", "sourceFirstFrame": "0", "sourceFrameCount": "3360000", "track": 2 }
+  ],
+  "titles": [
+    { "id": "demo-title", "text": "Adventure Awaits", "startFrame": "0", "durationFrames": "510", "fontPixels": 88, "color": "#ffffff" }
+  ],
+  "collections": [
+    { "id": "travel", "name": "Travel" },
+    { "id": "broll", "name": "B-Roll" },
+    { "id": "music", "name": "Music" }
+  ],
+  "segments": [
+    { "id": "demo-segment-lake", "label": "Blue hour lake", "assetId": "demo-lake", "firstFrame": "42", "endFrame": "203", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["lake", "mountains"], "notes": "Wide establishing shot", "rating": 5 },
+    { "id": "demo-segment-hike", "label": "Trail overlook", "assetId": "demo-hike", "firstFrame": "85", "endFrame": "247", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["hiker", "overlook"], "notes": "Good for opening sequence", "rating": 4 },
+    { "id": "demo-travel-03", "label": "Forest approach", "assetId": "demo-forest", "firstFrame": "0", "endFrame": "181", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["forest"], "notes": "", "rating": 3 },
+    { "id": "demo-travel-04", "label": "Sunset ridge", "assetId": "demo-sunset", "firstFrame": "105", "endFrame": "266", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["sunset"], "notes": "", "rating": 5 },
+    { "id": "demo-travel-05", "label": "Mountain campsite", "assetId": "demo-camp", "firstFrame": "22", "endFrame": "143", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["camp"], "notes": "", "rating": 4 },
+    { "id": "demo-travel-06", "label": "Road through valley", "assetId": "demo-road", "firstFrame": "91", "endFrame": "252", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["road"], "notes": "", "rating": 3 },
+    { "id": "demo-travel-07", "label": "Waves on shore", "assetId": "demo-waves", "firstFrame": "20", "endFrame": "181", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["water"], "notes": "", "rating": 4 },
+    { "id": "demo-travel-08", "label": "Aerial coast", "assetId": "demo-drone", "firstFrame": "51", "endFrame": "212", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["drone"], "notes": "", "rating": 5 },
+    { "id": "demo-travel-09", "label": "Lake reflection", "assetId": "demo-lake", "firstFrame": "215", "endFrame": "376", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["lake"], "notes": "", "rating": 4 },
+    { "id": "demo-travel-10", "label": "Alpine trail", "assetId": "demo-hike", "firstFrame": "278", "endFrame": "439", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["hiker"], "notes": "", "rating": 4 },
+    { "id": "demo-travel-11", "label": "Golden horizon", "assetId": "demo-sunset", "firstFrame": "329", "endFrame": "490", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["sunset"], "notes": "", "rating": 4 },
+    { "id": "demo-travel-12", "label": "Forest canopy", "assetId": "demo-forest", "firstFrame": "352", "endFrame": "513", "includeVideo": true, "includeAudio": false, "collectionId": "travel", "tags": ["forest"], "notes": "", "rating": 3 },
+    { "id": "demo-broll-01", "label": "Lake detail", "assetId": "demo-lake", "firstFrame": "20", "endFrame": "101", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["lake"], "notes": "", "rating": 4 },
+    { "id": "demo-broll-02", "label": "Woodland detail", "assetId": "demo-forest", "firstFrame": "75", "endFrame": "156", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["trees"], "notes": "", "rating": 3 },
+    { "id": "demo-broll-03", "label": "Backpack silhouette", "assetId": "demo-hike", "firstFrame": "115", "endFrame": "196", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["hiker"], "notes": "", "rating": 4 },
+    { "id": "demo-broll-04", "label": "Evening light", "assetId": "demo-sunset", "firstFrame": "210", "endFrame": "291", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["light"], "notes": "", "rating": 4 },
+    { "id": "demo-broll-05", "label": "Camp detail", "assetId": "demo-camp", "firstFrame": "130", "endFrame": "211", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["camp"], "notes": "", "rating": 3 },
+    { "id": "demo-broll-06", "label": "Passing road", "assetId": "demo-road", "firstFrame": "0", "endFrame": "81", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["road"], "notes": "", "rating": 3 },
+    { "id": "demo-broll-07", "label": "Breaking waves", "assetId": "demo-waves", "firstFrame": "200", "endFrame": "281", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["water"], "notes": "", "rating": 4 },
+    { "id": "demo-broll-08", "label": "Aerial movement", "assetId": "demo-drone", "firstFrame": "221", "endFrame": "302", "includeVideo": true, "includeAudio": false, "collectionId": "broll", "tags": ["drone"], "notes": "", "rating": 4 },
+    { "id": "demo-music-01", "label": "Music opening", "assetId": "demo-music", "firstFrame": "0", "endFrame": "576000", "includeVideo": false, "includeAudio": true, "collectionId": "music", "tags": ["music"], "notes": "", "rating": 4 },
+    { "id": "demo-music-02", "label": "Music middle", "assetId": "demo-music", "firstFrame": "672000", "endFrame": "1248000", "includeVideo": false, "includeAudio": true, "collectionId": "music", "tags": ["music"], "notes": "", "rating": 4 },
+    { "id": "demo-music-03", "label": "Music ending", "assetId": "demo-music", "firstFrame": "2208000", "endFrame": "2784000", "includeVideo": false, "includeAudio": true, "collectionId": "music", "tags": ["music"], "notes": "", "rating": 3 },
+    { "id": "demo-music-04", "label": "Outdoor ambience", "assetId": "demo-ambience", "firstFrame": "480000", "endFrame": "1056000", "includeVideo": false, "includeAudio": true, "collectionId": "music", "tags": ["ambience"], "notes": "", "rating": 5 },
+    { "id": "demo-music-05", "label": "Quiet outdoors", "assetId": "demo-ambience", "firstFrame": "2400000", "endFrame": "2976000", "includeVideo": false, "includeAudio": true, "collectionId": "music", "tags": ["ambience"], "notes": "", "rating": 4 }
+  ]
+}
