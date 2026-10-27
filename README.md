@@ -1,12 +1,12 @@
 # DataCut
 
-**0.7-beta** · Windows 10/11 · native C++23 and Qt 6 video editor.
+**0.7-beta.1** · Windows 10/11 · native C++23 and Qt 6 video editor.
 
 DataCut provides frame-aware timeline editing, multiple video and audio tracks, captions, text, effects, transitions, collections, and local exports. Optional local generation runtimes are installed separately through the app. Core editing works without them or a network connection.
 
 ## Download
 
-Get the portable Windows build from the [0.7-beta release](https://github.com/The-Faceless-Dev/DataCut/releases/tag/v0.7-beta). Extract the complete ZIP, then run `datacut.exe` inside the `DataCut` folder. Keep the DLLs and resource folders beside the executable.
+Get the portable Windows build from the [0.7-beta.1 release](https://github.com/The-Faceless-Dev/DataCut/releases/tag/v0.7-beta.1). Extract the complete ZIP, then run `datacut.exe` inside the `DataCut` folder. Keep the DLLs and resource folders beside the executable.
 
 The release ZIP contains the application and its native runtime libraries. It does **not** contain AI model weights, installed Python environments, user projects, generated media, or account data. Optional generation features offer separate setup from Settings.
 

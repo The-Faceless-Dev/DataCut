@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 #endif
     QApplication app(argc, argv);
     QGuiApplication::setApplicationName(QStringLiteral("DataCut"));
-    QGuiApplication::setApplicationVersion(QStringLiteral("0.7-beta"));
+    QGuiApplication::setApplicationVersion(QStringLiteral("0.7-beta.1"));
     const QIcon applicationIcon(QStringLiteral(":/app/datacut.png"));
     QGuiApplication::setWindowIcon(applicationIcon);
     QQuickStyle::setStyle(QStringLiteral("Basic"));

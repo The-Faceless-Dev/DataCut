@@ -41,7 +41,7 @@ void StartupSplash::drawContents(QPainter *painter)
     painter->setPen(QColor(QStringLiteral("#a0b3c7")));
     painter->drawText(bar.adjusted(22, 0, -22, 0),
                       Qt::AlignVCenter | Qt::AlignRight,
-                      QStringLiteral("DataCut 0.7-beta"));
+                      QStringLiteral("DataCut 0.7-beta.1"));
     painter->restore();
 }
 

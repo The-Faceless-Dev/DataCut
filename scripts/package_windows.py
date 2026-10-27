@@ -201,7 +201,7 @@ def main() -> int:
     try:
         remove_generated_directory(OUTPUT)
         STAGE.rename(OUTPUT)
-        archive = Path(shutil.make_archive(str(DIST / "DataCut-0.7-beta-windows-x64"),
+        archive = Path(shutil.make_archive(str(DIST / "DataCut-0.7-beta.1-windows-x64"),
                                            "zip", DIST, "DataCut"))
         # The development executable remains usable; optional models are never
         # copied into the build tree or included in the portable archive.
