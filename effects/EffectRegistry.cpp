@@ -60,7 +60,37 @@ const QVector<EffectDefinition> &builtinEffects()
                                                    {"amount", "Amount", 0, 100, 100}}, QStringLiteral("T")},
         {QStringLiteral("datacut.video.sharpen"), QStringLiteral("Sharpen"),
          QStringLiteral("Blur & Sharpness"), {}, {{"amount", "Amount", 0, 200, 100},
-                                                   {"radius", "Radius", 1, 4, 1}}, QStringLiteral("T")}
+                                                   {"radius", "Radius", 1, 4, 1}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.chromatic_shift"), QStringLiteral("Chromatic Shift"),
+         QStringLiteral("Optical"), {}, {{"offset", "Channel offset", 0, 30, 10},
+                                          {"angle", "Direction", 0, 360, 0}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.ripple_glass"), QStringLiteral("Ripple Glass"),
+         QStringLiteral("Distortion"), {}, {{"amplitude", "Refraction", 0, 30, 10},
+                                             {"frequency", "Ripple density", 2, 24, 9}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.digital_tear"), QStringLiteral("Digital Tear"),
+         QStringLiteral("Glitch"), {}, {{"amount", "Displacement", 0, 40, 14},
+                                        {"bands", "Band count", 3, 40, 12}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.kaleidoscope"), QStringLiteral("Kaleidoscope"),
+         QStringLiteral("Distortion"), {}, {{"segments", "Facets", 2, 16, 6},
+                                             {"mix", "Mix", 0, 100, 100}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.halation"), QStringLiteral("Halation"),
+         QStringLiteral("Optical"), {}, {{"radius", "Bloom radius", 1, 30, 12},
+                                        {"amount", "Warm glow", 0, 100, 65}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.duotone"), QStringLiteral("Duotone"),
+         QStringLiteral("Color & Lighting"), {}, {{"hue", "Shadow hue", 0, 360, 220},
+                                                  {"amount", "Mix", 0, 100, 100}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.scanline_glow"), QStringLiteral("Scanline Glow"),
+         QStringLiteral("Retro & Stylized"), {}, {{"spacing", "Line spacing", 2, 24, 6},
+                                                  {"amount", "Glow", 0, 100, 55}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.solarize"), QStringLiteral("Solarize"),
+         QStringLiteral("Color & Lighting"), {}, {{"threshold", "Threshold", 0, 255, 145},
+                                                  {"amount", "Mix", 0, 100, 100}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.emboss_light"), QStringLiteral("Embossed Light"),
+         QStringLiteral("Stylize"), {}, {{"depth", "Relief", 0, 100, 55},
+                                         {"distance", "Light distance", 1, 12, 3}}, QStringLiteral("T")},
+        {QStringLiteral("datacut.video.edge_neon"), QStringLiteral("Edge Neon"),
+         QStringLiteral("Stylize"), {}, {{"threshold", "Edge threshold", 0, 100, 25},
+                                         {"amount", "Glow", 0, 100, 80}}, QStringLiteral("T")}
     };
     return effects;
 }
@@ -104,6 +134,110 @@ QString parameterizedEffectFilter(const QString &id, const QMap<QString, QString
     const QString green = channel(QLatin1Char('g'));
     const QString blue = channel(QLatin1Char('b'));
     const QString suffix = id.section(QLatin1Char('.'), -1);
+    // The advanced processors operate on straight RGB and preserve the alpha
+    // plane. This is essential for titles and transparent image clips.
+    const auto advancedRgb = [](const QString &r, const QString &g,
+                                const QString &b, const QString &a = QStringLiteral("alpha(X\\,Y)")) {
+        return QStringLiteral("format=gbrap,geq=r='%1':g='%2':b='%3':a='%4',format=rgba")
+            .arg(r, g, b, a);
+    };
+    const auto sample = [](QChar c, const QString &x, const QString &y = QStringLiteral("Y")) {
+        return QString(c) + QStringLiteral("(%1\\,%2)").arg(x, y);
+    };
+    if (suffix == QStringLiteral("chromatic_shift")) {
+        const QString dx = QStringLiteral("(%1)*cos((%2)*PI/180)")
+            .arg(value(QStringLiteral("offset")), value(QStringLiteral("angle")));
+        const QString dy = QStringLiteral("(%1)*sin((%2)*PI/180)")
+            .arg(value(QStringLiteral("offset")), value(QStringLiteral("angle")));
+        return advancedRgb(sample('r', QStringLiteral("X-(%1)").arg(dx), QStringLiteral("Y-(%1)").arg(dy)),
+                           green, sample('b', QStringLiteral("X+(%1)").arg(dx), QStringLiteral("Y+(%1)").arg(dy)));
+    }
+    if (suffix == QStringLiteral("ripple_glass")) {
+        const QString dx = QStringLiteral("(%1)*sin(2*PI*(%2)*Y/H)")
+            .arg(value(QStringLiteral("amplitude")), value(QStringLiteral("frequency")));
+        const QString dy = QStringLiteral("(%1)*sin(2*PI*(%2)*X/W)/2")
+            .arg(value(QStringLiteral("amplitude")), value(QStringLiteral("frequency")));
+        const QString x = QStringLiteral("X+(%1)").arg(dx);
+        const QString y = QStringLiteral("Y+(%1)").arg(dy);
+        return advancedRgb(sample('r', x, y), sample('g', x, y),
+                           sample('b', x, y), QStringLiteral("alpha(%1\\,%2)").arg(x, y));
+    }
+    if (suffix == QStringLiteral("digital_tear")) {
+        const QString band = QStringLiteral("floor(Y*(%1)/H)").arg(value(QStringLiteral("bands")));
+        const QString shift = QStringLiteral("(%1)*sin((%2)*78.233)*sin((%2)*12.9898)")
+            .arg(value(QStringLiteral("amount")), band);
+        const QString x = QStringLiteral("X+(%1)").arg(shift);
+        return advancedRgb(sample('r', x), sample('g', x), sample('b', x),
+                           QStringLiteral("alpha(%1\\,Y)").arg(x));
+    }
+    if (suffix == QStringLiteral("kaleidoscope")) {
+        const QString facets = value(QStringLiteral("segments"));
+        const QString reflected = QStringLiteral("abs(mod(X*(%1)/W\\,2)-1)*W").arg(facets);
+        const QString x = QStringLiteral("X*(1-(%1)/100)+(%2)*(%1)/100")
+            .arg(value(QStringLiteral("mix")), reflected);
+        return advancedRgb(sample('r', x), sample('g', x), sample('b', x),
+                           QStringLiteral("alpha(%1\\,Y)").arg(x));
+    }
+    if (suffix == QStringLiteral("halation")) {
+        const QString radius = value(QStringLiteral("radius"));
+        const QString bloom = QStringLiteral("max(0\\,(r(X-(%1)\\,Y)+r(X+(%1)\\,Y)"
+            "+r(X\\,Y-(%1))+r(X\\,Y+(%1)))/4-135)").arg(radius);
+        const QString amount = value(QStringLiteral("amount"));
+        return advancedRgb(bounded(QStringLiteral("%1+(%2)*(%3)/100").arg(red, bloom, amount)),
+            bounded(QStringLiteral("%1+(%2)*(%3)/220").arg(green, bloom, amount)), blue);
+    }
+    if (suffix == QStringLiteral("duotone")) {
+        const QString lum = QStringLiteral("(0.299*%1+0.587*%2+0.114*%3)/255")
+            .arg(red, green, blue);
+        const QString angle = QStringLiteral("(%1)*PI/180").arg(value(QStringLiteral("hue")));
+        const QString mix = value(QStringLiteral("amount"));
+        const QString shadowR = QStringLiteral("(0.5+0.5*cos(%1))*110").arg(angle);
+        const QString shadowG = QStringLiteral("(0.5+0.5*cos((%1)-2.094395))*110").arg(angle);
+        const QString shadowB = QStringLiteral("(0.5+0.5*cos((%1)+2.094395))*110").arg(angle);
+        const auto tone = [&](const QString &original, const QString &shadow) {
+            return bounded(QStringLiteral("(%1)*(1-(%2)/100)+((%3)*(1-(%4))+255*(%4))*(%2)/100")
+                .arg(original, mix, shadow, lum));
+        };
+        return advancedRgb(tone(red, shadowR), tone(green, shadowG), tone(blue, shadowB));
+    }
+    if (suffix == QStringLiteral("scanline_glow")) {
+        const QString line = QStringLiteral("(0.7+0.3*cos(2*PI*Y/(%1)))")
+            .arg(value(QStringLiteral("spacing")));
+        const QString amount = value(QStringLiteral("amount"));
+        const auto scan = [&](const QString &original) {
+            return bounded(QStringLiteral("(%1)*((1-(%2)/100)+(%2)/100*(%3))")
+                .arg(original, amount, line));
+        };
+        return advancedRgb(scan(red), scan(green), scan(blue));
+    }
+    if (suffix == QStringLiteral("solarize")) {
+        const auto solar = [&](const QString &original) {
+            return bounded(QStringLiteral("(%1)*(1-(%2)/100)+if(gt(%1\\,(%3))\\,255-%1\\,%1)*(%2)/100")
+                .arg(original, value(QStringLiteral("amount")), value(QStringLiteral("threshold"))));
+        };
+        return advancedRgb(solar(red), solar(green), solar(blue));
+    }
+    if (suffix == QStringLiteral("emboss_light")) {
+        const QString distance = value(QStringLiteral("distance"));
+        const QString relief = QStringLiteral("(0.299*(r(X-(%1)\\,Y-(%1))-r(X+(%1)\\,Y+(%1)))"
+            "+0.587*(g(X-(%1)\\,Y-(%1))-g(X+(%1)\\,Y+(%1)))"
+            "+0.114*(b(X-(%1)\\,Y-(%1))-b(X+(%1)\\,Y+(%1))))")
+            .arg(distance);
+        const auto emboss = [&](const QString &original) {
+            return bounded(QStringLiteral("(%1)*(1-(%2)/100)+(128+(%3))*(%2)/100")
+                .arg(original, value(QStringLiteral("depth")), relief));
+        };
+        return advancedRgb(emboss(red), emboss(green), emboss(blue));
+    }
+    if (suffix == QStringLiteral("edge_neon")) {
+        const QString edge = QStringLiteral("max(0\\,abs(0.299*(r(X+2\\,Y)-r(X-2\\,Y))"
+            "+0.587*(g(X+2\\,Y)-g(X-2\\,Y))+0.114*(b(X+2\\,Y)-b(X-2\\,Y)))"
+            "-(%1))").arg(value(QStringLiteral("threshold")));
+        const QString amount = value(QStringLiteral("amount"));
+        return advancedRgb(bounded(QStringLiteral("%1+(%2)*(%3)/250").arg(red, edge, amount)),
+            bounded(QStringLiteral("%1+(%2)*(%3)/120").arg(green, edge, amount)),
+            bounded(QStringLiteral("%1+(%2)*(%3)/80").arg(blue, edge, amount)));
+    }
     if (suffix == QStringLiteral("contrast")) {
         const auto adjust = [&](const QString &source) {
             return bounded(QStringLiteral("((%1)-(%2)*2.55)*(%3)/100+(%2)*2.55")

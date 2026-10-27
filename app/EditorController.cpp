@@ -56,7 +56,12 @@ int spatialMaskKind(const QString &renderer)
         QStringLiteral("wipe_down"), QStringLiteral("wipe_up"),
         QStringLiteral("diagonal_wipe"), QStringLiteral("split_reveal"),
         QStringLiteral("circle_iris"), QStringLiteral("diamond_iris"),
-        QStringLiteral("venetian_blinds"), QStringLiteral("checker_reveal")};
+        QStringLiteral("venetian_blinds"), QStringLiteral("checker_reveal"),
+        QStringLiteral("liquid_wave"), QStringLiteral("ripple_rings"),
+        QStringLiteral("prism_sweep"), QStringLiteral("shattered_glass"),
+        QStringLiteral("hex_mosaic"), QStringLiteral("radial_burst"),
+        QStringLiteral("pixel_storm"), QStringLiteral("ribbon_twist"),
+        QStringLiteral("ink_bloom"), QStringLiteral("crosshatch")};
     return names.indexOf(renderer) + 1;
 }
 
@@ -81,22 +86,44 @@ QString spatialMaskFilter(int kind, int softness, int complexity,
     case 9: coordinate = QStringLiteral("mod(%1*%2,1)").arg(u, count); break;
     case 10: coordinate = QStringLiteral("(mod(floor(%1*%3)+floor(%2*%3),2)*0.5+mod(%1*%3,1)*0.5)")
         .arg(u, v, count); break;
+    case 11: coordinate = QStringLiteral("(%1+0.16*sin(%2*18.849556+%1*6.283185))").arg(u, v); break;
+    case 12: coordinate = QStringLiteral("mod(sqrt((%1-0.5)^2+(%2-0.5)^2)*%3,1)").arg(u, v, count); break;
+    case 13: coordinate = QStringLiteral("(%1+0.13*sin(%2*%3*3.141593))").arg(u, v, count); break;
+    case 14: coordinate = QStringLiteral("(mod(floor(%1*%3)+floor(%2*%3)*3,5)/5"
+        "+mod((%1+%2)*%3,1)/5)").arg(u, v, count); break;
+    case 15: coordinate = QStringLiteral("(mod(floor(%1*%3)+floor(%2*%3/1.732)*2,7)/7"
+        "+mod(%1*%3+mod(floor(%2*%3/1.732),2)*0.5,1)/7)").arg(u, v, count); break;
+    case 16: coordinate = QStringLiteral("(abs(%1-0.5)+abs(%2-0.5)"
+        "+0.12*sin((%1-%2)*%3*3.141593))").arg(u, v, count); break;
+    case 17: coordinate = QStringLiteral("(mod(floor(%1*%3)*7+floor(%2*%3)*11,13)/13"
+        "+mod(%1*%3,1)/13)").arg(u, v, count); break;
+    case 18: coordinate = QStringLiteral("(mod(%2*%3,1)*0.55+%1*0.45"
+        "+0.08*sin(%2*%3*6.283185))").arg(u, v, count); break;
+    case 19: coordinate = QStringLiteral("(sqrt((%1-0.5)^2+(%2-0.5)^2)/0.70710678"
+        "+0.13*sin(%1*%3*3.141593)*sin(%2*%3*3.141593))").arg(u, v, count); break;
+    case 20: coordinate = QStringLiteral("min(mod(%1*%3,1),mod(%2*%3,1))").arg(u, v, count); break;
     default: return {};
     }
     const QString width = QString::number(std::max(0.000001, softness / 100.0), 'f', 6);
-    const QString delta = reveal ? QStringLiteral("(%1)-(%2)").arg(progress, coordinate)
-                                 : QStringLiteral("(%1)-(%2)").arg(coordinate, progress);
-    QString mask = QStringLiteral("max(0,min(1,(%1)/%2+0.5))").arg(delta, width);
+    // Procedural coordinates can overshoot at the canvas edges. Bound them so
+    // every pixel is fully revealed by the end of a transition.
+    const QString normalized = QStringLiteral("max(0,min(1,%1))").arg(coordinate);
+    const QString boundedDelta = reveal ? QStringLiteral("(%1)-(%2)").arg(progress, normalized)
+                                        : QStringLiteral("(%1)-(%2)").arg(normalized, progress);
+    QString mask = QStringLiteral("max(0,min(1,(%1)/%2+0.5))").arg(boundedDelta, width);
     if (!condition.isEmpty())
         mask = QStringLiteral("if(%1,%2,1)").arg(condition, mask);
     return QStringLiteral("format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':"
                           "a='alpha(X,Y)*%1',format=rgba").arg(mask);
 }
 
-QString spatialProgress(const QString &linear, int speed)
+QString spatialProgress(const QString &linear, int speed, int softness)
 {
-    return QStringLiteral("pow(max(0,min(1,%1)),%2)")
-        .arg(linear, QString::number(100.0 / std::clamp(speed, 25, 200), 'f', 6));
+    const double margin = std::max(0.000001, softness / 100.0) / 2.0;
+    return QStringLiteral("(-%1+(1+%2)*pow(max(0,min(1,%3)),%4))")
+        .arg(QString::number(margin, 'f', 6),
+             QString::number(margin * 2.0, 'f', 6), linear,
+             QString::number(100.0 / std::clamp(speed, 25, 200), 'f', 6));
 }
 struct CaptionStyleDefinition {
     const char *id;
@@ -1948,8 +1975,11 @@ QVariantMap EditorController::transitionPreviewForTrack(int track) const
             {"otherOpacity", 0.0}};
         const int maskKind = spatialMaskKind(renderer);
         if (maskKind > 0) {
-            const double linear = std::clamp((frame - start + 0.5) / double(duration), 0.0, 1.0);
-            const double progress = std::pow(linear,
+            const double linear = duration <= 1 ? 1.0 : std::clamp(
+                (frame - start) / double(duration - 1), 0.0, 1.0);
+            const double margin = std::max(0.000001,
+                transition->parameters.value(QStringLiteral("softness"), 3) / 100.0) / 2.0;
+            const double progress = -margin + (1.0 + 2.0 * margin) * std::pow(linear,
                 100.0 / std::clamp(transition->parameters.value(QStringLiteral("speed"), 100), 25, 200));
             const QVariantMap mask{{"kind", maskKind}, {"progress", progress},
                 {"softness", transition->parameters.value(QStringLiteral("softness"), 3)},
@@ -7637,11 +7667,13 @@ void EditorController::startProjectExport(const QUrl &outputUrl, bool selectedRa
         if (!kind || isPairedTransition(transition)) return QString{};
         const qint64 frames = std::min(objectFrames, transition.durationFrames);
         if (frames <= 0) return QString{};
-        const QString local = startEdge ? QStringLiteral("(N+0.5)")
-            : QStringLiteral("(N-%1+0.5)").arg(objectFrames - frames);
+        const QString local = startEdge ? QStringLiteral("N")
+            : QStringLiteral("(N-%1)").arg(objectFrames - frames);
         const QString progress = spatialProgress(
-            QStringLiteral("(%1/%2)").arg(local).arg(frames),
-            transition.parameters.value(QStringLiteral("speed"), 100));
+            frames <= 1 ? QStringLiteral("1")
+                : QStringLiteral("(%1/%2)").arg(local).arg(frames - 1),
+            transition.parameters.value(QStringLiteral("speed"), 100),
+            transition.parameters.value(QStringLiteral("softness"), 3));
         const QString condition = startEdge
             ? QStringLiteral("lt(N,%1)").arg(frames)
             : QStringLiteral("gte(N,%1)").arg(objectFrames - frames);
@@ -7655,11 +7687,12 @@ void EditorController::startProjectExport(const QUrl &outputUrl, bool selectedRa
         const int kind = definition ? spatialMaskKind(definition->renderer) : 0;
         if (!kind) return QString{};
         const qint64 total = cross.leftFrames + cross.rightFrames;
-        const QString linear = incoming
-            ? QStringLiteral("((N+0.5)/%1)").arg(total)
-            : QStringLiteral("((%1+N+0.5)/%2)").arg(cross.leftFrames).arg(total);
+        const QString linear = total <= 1 ? QStringLiteral("1") : incoming
+            ? QStringLiteral("(N/%1)").arg(total - 1)
+            : QStringLiteral("((%1+N)/%2)").arg(cross.leftFrames).arg(total - 1);
         const QString progress = spatialProgress(linear,
-            cross.transition->parameters.value(QStringLiteral("speed"), 100));
+            cross.transition->parameters.value(QStringLiteral("speed"), 100),
+            cross.transition->parameters.value(QStringLiteral("softness"), 3));
         return spatialMaskFilter(kind,
             cross.transition->parameters.value(QStringLiteral("softness"), 3),
             cross.transition->parameters.value(QStringLiteral("complexity"), 6),

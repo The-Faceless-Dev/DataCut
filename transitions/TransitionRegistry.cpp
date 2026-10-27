@@ -69,18 +69,32 @@ TransitionRegistry::TransitionRegistry()
         {QStringLiteral("circle_iris"), QStringLiteral("Circle Iris")},
         {QStringLiteral("diamond_iris"), QStringLiteral("Diamond Iris")},
         {QStringLiteral("venetian_blinds"), QStringLiteral("Venetian Blinds")},
-        {QStringLiteral("checker_reveal"), QStringLiteral("Checker Reveal")}};
+        {QStringLiteral("checker_reveal"), QStringLiteral("Checker Reveal")},
+        {QStringLiteral("liquid_wave"), QStringLiteral("Liquid Wave")},
+        {QStringLiteral("ripple_rings"), QStringLiteral("Ripple Rings")},
+        {QStringLiteral("prism_sweep"), QStringLiteral("Prism Sweep")},
+        {QStringLiteral("shattered_glass"), QStringLiteral("Shattered Glass")},
+        {QStringLiteral("hex_mosaic"), QStringLiteral("Hex Mosaic")},
+        {QStringLiteral("radial_burst"), QStringLiteral("Radial Burst")},
+        {QStringLiteral("pixel_storm"), QStringLiteral("Pixel Storm")},
+        {QStringLiteral("ribbon_twist"), QStringLiteral("Ribbon Twist")},
+        {QStringLiteral("ink_bloom"), QStringLiteral("Ink Bloom")},
+        {QStringLiteral("crosshatch"), QStringLiteral("Crosshatch")}};
+    int maskIndex = 0;
     for (const auto &[renderer, name] : masks) {
+        const bool procedural = maskIndex++ >= 10;
         registerRenderer(renderer, spatial, true);
         QVector<TransitionParameterDefinition> parameters{
             {QStringLiteral("speed"), QStringLiteral("Speed"), 25, 200, 100},
             {QStringLiteral("softness"), QStringLiteral("Edge softness"), 0, 30, 3}};
         if (renderer == QStringLiteral("venetian_blinds")
-            || renderer == QStringLiteral("checker_reveal"))
+            || renderer == QStringLiteral("checker_reveal")
+            || procedural)
             parameters.append({QStringLiteral("complexity"), QStringLiteral("Complexity"), 2, 16, 6});
         registerDefinition({QStringLiteral("datacut.transition.") + renderer,
-            name, renderer.contains(QStringLiteral("split"))
-                ? QStringLiteral("Split") : QStringLiteral("Mask"),
+            name, procedural ? QStringLiteral("Procedural")
+                : renderer.contains(QStringLiteral("split"))
+                    ? QStringLiteral("Split") : QStringLiteral("Mask"),
             renderer, parameters});
     }
     registerDefinition({QStringLiteral("datacut.transition.cross_dissolve"),

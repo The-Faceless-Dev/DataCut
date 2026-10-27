@@ -871,6 +871,36 @@ ApplicationWindow {
         property real sharpen_enabled: settings.sharpen_enabled || 0
         property real sharpen_amount: settings.sharpen_amount || 0
         property real sharpen_radius: settings.sharpen_radius || 0
+        property real chromatic_shift_enabled: settings.chromatic_shift_enabled || 0
+        property real chromatic_shift_offset: settings.chromatic_shift_offset || 0
+        property real chromatic_shift_angle: settings.chromatic_shift_angle || 0
+        property real ripple_glass_enabled: settings.ripple_glass_enabled || 0
+        property real ripple_glass_amplitude: settings.ripple_glass_amplitude || 0
+        property real ripple_glass_frequency: settings.ripple_glass_frequency || 0
+        property real digital_tear_enabled: settings.digital_tear_enabled || 0
+        property real digital_tear_amount: settings.digital_tear_amount || 0
+        property real digital_tear_bands: settings.digital_tear_bands || 0
+        property real kaleidoscope_enabled: settings.kaleidoscope_enabled || 0
+        property real kaleidoscope_segments: settings.kaleidoscope_segments || 0
+        property real kaleidoscope_mix: settings.kaleidoscope_mix || 0
+        property real halation_enabled: settings.halation_enabled || 0
+        property real halation_radius: settings.halation_radius || 0
+        property real halation_amount: settings.halation_amount || 0
+        property real duotone_enabled: settings.duotone_enabled || 0
+        property real duotone_hue: settings.duotone_hue || 0
+        property real duotone_amount: settings.duotone_amount || 0
+        property real scanline_glow_enabled: settings.scanline_glow_enabled || 0
+        property real scanline_glow_spacing: settings.scanline_glow_spacing || 0
+        property real scanline_glow_amount: settings.scanline_glow_amount || 0
+        property real solarize_enabled: settings.solarize_enabled || 0
+        property real solarize_threshold: settings.solarize_threshold || 0
+        property real solarize_amount: settings.solarize_amount || 0
+        property real emboss_light_enabled: settings.emboss_light_enabled || 0
+        property real emboss_light_depth: settings.emboss_light_depth || 0
+        property real emboss_light_distance: settings.emboss_light_distance || 0
+        property real edge_neon_enabled: settings.edge_neon_enabled || 0
+        property real edge_neon_threshold: settings.edge_neon_threshold || 0
+        property real edge_neon_amount: settings.edge_neon_amount || 0
         fragmentShader: "qrc:/shaders/render/shaders/video_effects.frag.qsb"
     }
 
