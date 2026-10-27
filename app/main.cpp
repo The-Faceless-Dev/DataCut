@@ -163,6 +163,12 @@ int main(int argc, char *argv[])
         if (!capturePath.isEmpty()) {
             window->resize(1672, 941);
             window->show();
+            // Diagnostic captures can include an actual playback frame, which
+            // exercises bindings that a static seek does not.
+            if (qEnvironmentVariableIsSet("DATACUT_CAPTURE_PLAYBACK"))
+                QTimer::singleShot(3000, &app, [&controller] {
+                    controller.toggleTimelinePlayback();
+                });
             bool validDelay = false;
             const int requestedDelay = qEnvironmentVariableIntValue(
                 "DATACUT_CAPTURE_DELAY_MS", &validDelay);

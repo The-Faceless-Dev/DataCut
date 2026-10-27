@@ -113,8 +113,28 @@ QString spatialMaskFilter(int kind, int softness, int complexity,
     QString mask = QStringLiteral("max(0,min(1,(%1)/%2+0.5))").arg(boundedDelta, width);
     if (!condition.isEmpty())
         mask = QStringLiteral("if(%1,%2,1)").arg(condition, mask);
-    return QStringLiteral("format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':"
-                          "a='alpha(X,Y)*%1',format=rgba").arg(mask);
+    if (kind < 11)
+        return QStringLiteral("format=gbrap,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':"
+                              "a='alpha(X,Y)*%1',format=rgba").arg(mask);
+    // Procedural reveals carry a luminous moving edge. It remains visible even
+    // when a transition joins adjacent frames of the same source recording.
+    static constexpr double accents[10][3] = {
+        {0.18, 0.82, 1.00}, {0.40, 0.65, 1.00}, {1.00, 0.55, 0.96},
+        {1.00, 0.94, 0.78}, {1.00, 0.64, 0.27}, {1.00, 0.82, 0.38},
+        {1.00, 0.30, 0.73}, {0.70, 0.49, 1.00}, {0.76, 0.91, 0.73},
+        {0.75, 0.93, 1.00}
+    };
+    const QString phase = QStringLiteral("sin(PI*max(0,min(1,%1)))").arg(progress);
+    const QString edge = QStringLiteral("max(0,1-abs((%1)-(%2))/0.075)*(%3)")
+        .arg(normalized, progress, phase);
+    const auto lit = [&](QChar channel, double accent) {
+        return QStringLiteral("clip(%1(X,Y)+255*(%2)*%3,0,255)")
+            .arg(QString(channel), edge, QString::number(accent * 0.85, 'f', 4));
+    };
+    const auto &accent = accents[kind - 11];
+    return QStringLiteral("format=gbrap,geq=r='%1':g='%2':b='%3':"
+                          "a='alpha(X,Y)*%4',format=rgba")
+        .arg(lit('r', accent[0]), lit('g', accent[1]), lit('b', accent[2]), mask);
 }
 
 QString spatialProgress(const QString &linear, int speed, int softness)
