@@ -8505,8 +8505,12 @@ void EditorController::startProjectExport(const QUrl &outputUrl, bool selectedRa
                 audioFilter += QStringLiteral(",afade=t=out:st=%1:d=%2")
                     .arg(seconds(clip.durationFrames - clip.fadeOutFrames),
                          seconds(clip.fadeOutFrames));
-            audioFilter += QStringLiteral(",asetpts=PTS+%1[%2]")
-                .arg(offsetExpr(clip.startFrame), audioName);
+            // amix consumes samples from each input immediately; shifting PTS
+            // alone does not leave silence before a later timeline clip.
+            const qint64 delaySamples = rescaleFrames(
+                clip.startFrame, m_projectRate, FrameRate{48000, 1});
+            audioFilter += QStringLiteral(",adelay=%1S:all=1[%2]")
+                .arg(delaySamples).arg(audioName);
             filters << audioFilter;
             audioInputs << QStringLiteral("[%1]").arg(audioName);
         }
@@ -8692,9 +8696,10 @@ void EditorController::startProjectAudioExport(const QUrl &outputUrl)
             filter += QStringLiteral(",afade=t=out:st=%1:d=%2")
                 .arg(seconds(clip.durationFrames - clip.fadeOutFrames),
                      seconds(clip.fadeOutFrames));
-        filter += QStringLiteral(",asetpts=PTS+%1*%2/(%3*TB)[a%4]")
-            .arg(clip.startFrame).arg(m_projectRate.denominator)
-            .arg(m_projectRate.numerator).arg(i);
+        const qint64 delaySamples = rescaleFrames(
+            clip.startFrame, m_projectRate, FrameRate{48000, 1});
+        filter += QStringLiteral(",adelay=%1S:all=1[a%2]")
+            .arg(delaySamples).arg(i);
         filters << filter;
         inputs << QStringLiteral("[a%1]").arg(i);
     }
