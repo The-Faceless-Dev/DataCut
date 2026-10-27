@@ -438,6 +438,20 @@ ApplicationWindow {
         titleColorDialog.selectedColor = current
         titleColorDialog.open()
     }
+    function transitionColorHex(value) {
+        return "#" + ("000000" + Number(value).toString(16)).slice(-6)
+    }
+    ColorDialog {
+        id: transitionColorDialog
+        property string transitionId: ""
+        title: "Transition edge color"
+        onAccepted: {
+            const rgb = (Math.round(selectedColor.r * 255) << 16)
+                | (Math.round(selectedColor.g * 255) << 8)
+                | Math.round(selectedColor.b * 255)
+            editor.setTransitionParameter(transitionId, "edge_color", rgb)
+        }
+    }
 
     palette.window: panelColor
     palette.windowText: textColor
@@ -838,6 +852,9 @@ ApplicationWindow {
         property real transition_softness: transitionMask.softness || 0
         property real transition_complexity: transitionMask.complexity || 6
         property real transition_reveal: transitionMask.reveal ? 1 : 0
+        property real transition_edge_enabled: transitionMask.edgeEnabled || 0
+        property color transition_edge_color: transitionColorHex(
+            transitionMask.edgeColor === undefined ? 0xFFFFFF : transitionMask.edgeColor)
         property real saturation: settings.saturation || 0
         property real brightness: settings.brightness || 0
         property real blur: settings.blur || 0
@@ -4250,7 +4267,8 @@ ApplicationWindow {
                                 }
                                 Repeater {
                                     model: activeTransitionDefinition ? activeTransitionDefinition.parameters.filter(function(item) {
-                                        return item.id !== "balance"
+                                        return item.id !== "balance" && item.id !== "edge_enabled"
+                                            && item.id !== "edge_color"
                                     }) : []
                                     delegate: RowLayout {
                                         required property var modelData
@@ -4262,6 +4280,30 @@ ApplicationWindow {
                                                 ? activeTransition.parameters[modelData.id] : modelData.initial
                                             onPressedChanged: if (!pressed && activeTransition)
                                                 editor.setTransitionParameter(activeTransition.id, modelData.id, Math.round(value))
+                                        }
+                                    }
+                                }
+                                RowLayout {
+                                    visible: !!activeTransitionDefinition
+                                        && activeTransitionDefinition.parameters.some(function(item) { return item.id === "edge_enabled" })
+                                    Layout.fillWidth: true; spacing: 9
+                                    CheckBox {
+                                        text: "Colored edge"
+                                        checked: !!activeTransition && activeTransition.parameters.edge_enabled === 1
+                                        onClicked: if (activeTransition)
+                                            editor.setTransitionParameter(activeTransition.id, "edge_enabled", checked ? 1 : 0)
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                    CaptionColor {
+                                        Layout.preferredWidth: 112
+                                        text: "Color"
+                                        visible: !!activeTransition && activeTransition.parameters.edge_enabled === 1
+                                        colorValue: transitionColorHex(activeTransition && activeTransition.parameters.edge_color !== undefined
+                                            ? activeTransition.parameters.edge_color : 0xFFFFFF)
+                                        onClicked: if (activeTransition) {
+                                            transitionColorDialog.transitionId = activeTransition.id
+                                            transitionColorDialog.selectedColor = colorValue
+                                            transitionColorDialog.open()
                                         }
                                     }
                                 }

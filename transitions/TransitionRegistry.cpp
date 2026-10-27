@@ -91,6 +91,10 @@ TransitionRegistry::TransitionRegistry()
             || renderer == QStringLiteral("checker_reveal")
             || procedural)
             parameters.append({QStringLiteral("complexity"), QStringLiteral("Complexity"), 2, 16, 6});
+        if (procedural) {
+            parameters.append({QStringLiteral("edge_enabled"), QStringLiteral("Colored edge"), 0, 1, 0});
+            parameters.append({QStringLiteral("edge_color"), QStringLiteral("Edge color"), 0, 0xFFFFFF, 0xFFFFFF});
+        }
         registerDefinition({QStringLiteral("datacut.transition.") + renderer,
             name, procedural ? QStringLiteral("Procedural")
                 : renderer.contains(QStringLiteral("split"))

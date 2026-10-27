@@ -12,6 +12,8 @@ layout(std140, binding = 0) uniform buf {
     float transition_softness;
     float transition_complexity;
     float transition_reveal;
+    float transition_edge_enabled;
+    vec4 transition_edge_color;
     float saturation;
     float brightness;
     float blur;
@@ -250,20 +252,10 @@ void main() {
     }
     if (transition_kind > 0.5) {
         float coordinate = clamp(transitionCoordinate(uv), 0.0, 1.0);
-        if (transition_kind > 10.5) {
-            vec3 accent = vec3(0.75, 0.93, 1.0);
-            if (transition_kind < 11.5) accent = vec3(0.18, 0.82, 1.0);
-            else if (transition_kind < 12.5) accent = vec3(0.40, 0.65, 1.0);
-            else if (transition_kind < 13.5) accent = vec3(1.0, 0.55, 0.96);
-            else if (transition_kind < 14.5) accent = vec3(1.0, 0.94, 0.78);
-            else if (transition_kind < 15.5) accent = vec3(1.0, 0.64, 0.27);
-            else if (transition_kind < 16.5) accent = vec3(1.0, 0.82, 0.38);
-            else if (transition_kind < 17.5) accent = vec3(1.0, 0.30, 0.73);
-            else if (transition_kind < 18.5) accent = vec3(0.70, 0.49, 1.0);
-            else if (transition_kind < 19.5) accent = vec3(0.76, 0.91, 0.73);
+        if (transition_kind > 10.5 && transition_edge_enabled > 0.5) {
             float phase = sin(3.14159265 * clamp(transition_progress, 0.0, 1.0));
             float edge = max(0.0, 1.0 - abs(coordinate - transition_progress) / 0.075);
-            color += accent * (edge * phase * 0.85);
+            color += transition_edge_color.rgb * (edge * phase * 0.85);
         }
         float delta = transition_reveal > 0.5
             ? transition_progress - coordinate : coordinate - transition_progress;
